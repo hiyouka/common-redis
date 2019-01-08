@@ -3,7 +3,7 @@
 ## RedisLock
 
 RedisLock have tow implementation class:
-  DefauleRedisLock : not support reentrant lock
+  DefauleRedisLock : not support reentrant lock<br/>
   ReentrantLock : support thread reentrant
 
 ### Example:
