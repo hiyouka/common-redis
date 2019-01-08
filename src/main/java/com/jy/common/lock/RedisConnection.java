@@ -1,12 +1,12 @@
 package com.jy.common.lock;
 
-import org.springframework.data.redis.connection.RedisCommands;
+import redis.clients.jedis.JedisCommands;
 
 public interface RedisConnection {
 
     /**
      * get redis connection
      */
-    RedisCommands getConnection();
+    JedisCommands getConnection();
 
 }

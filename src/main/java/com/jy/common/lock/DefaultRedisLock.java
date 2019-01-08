@@ -48,28 +48,26 @@ public class DefaultRedisLock extends AbstractRedisLock{
 
     /**
      * blocking RedisLock
-     *
-     * @param key lock key
+     *  @param key lock key
      * @param request lock val
      */
-    public void lock(String key, String request) throws InterruptedException {
+    public boolean lock(String key, String request) throws InterruptedException {
         //get connection
         Object connection = getConnection();
         String result ;
         for (; ;) {
             result = setRedisVal(key, request,-1,connection);
             if (LOCK_MSG.equals(result)) {
-                break;
+                return true;
             }
             Thread.sleep(sleepTime);
         }
-
     }
 
     protected String setRedisVal(String key, String request, int expireTime, Object connection) {
         String result;
         if(expireTime < 0){
-            expireTime = 10 * TIME;
+            expireTime = Integer.MAX_VALUE; // no expire time
         }
         if (connection instanceof Jedis){
             result = ((Jedis)connection).set(lockPrefix + key, request, SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, expireTime);

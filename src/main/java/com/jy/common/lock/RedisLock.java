@@ -27,11 +27,10 @@ public interface RedisLock {
 
     /**
      * blocking RedisLock
-     *
-     * @param key
+     *  @param key
      * @param token
      */
-    void lock(String key, String token) throws InterruptedException;
+    boolean lock(String key, String token) throws InterruptedException;
 
     /**
      * blocking RedisLock,custom time

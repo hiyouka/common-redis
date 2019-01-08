@@ -3,9 +3,9 @@ package com.jy.common.lock;
 import com.jy.common.constant.RedisType;
 import com.jy.common.util.ScriptUtil;
 import org.springframework.data.redis.connection.RedisClusterConnection;
-import org.springframework.data.redis.connection.RedisCommands;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import redis.clients.jedis.JedisCommands;
 
 public abstract class AbstractRedisLock implements RedisLock, com.jy.common.lock.RedisConnection {
 
@@ -16,14 +16,14 @@ public abstract class AbstractRedisLock implements RedisLock, com.jy.common.lock
     /**
      * lua script
      */
-    String script = ScriptUtil.getScript("RedisLock.lua");
+    String script = ScriptUtil.getScript("unlock.lua");
 
 
     /**
      * get Redis connection
      * @return RedisCommands
      */
-    public RedisCommands getConnection() {
+    public JedisCommands getConnection() {
         Object connection = null;
         if (type == RedisType.SINGLE){
             RedisConnection redisConnection = jedisConnectionFactory.getConnection();
@@ -32,8 +32,8 @@ public abstract class AbstractRedisLock implements RedisLock, com.jy.common.lock
             RedisClusterConnection clusterConnection = jedisConnectionFactory.getClusterConnection();
             connection = clusterConnection.getNativeConnection() ;
         }
-        if(connection instanceof RedisCommands){
-            return (RedisCommands) connection;
+        if(connection instanceof JedisCommands){
+            return (JedisCommands) connection;
         }else {
             return null;
         }

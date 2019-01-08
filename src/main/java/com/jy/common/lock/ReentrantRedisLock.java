@@ -1,9 +1,5 @@
 package com.jy.common.lock;
 
-import org.springframework.util.StringUtils;
-import java.util.UUID;
-
-
 /**
  * Function:
  * token can be customized but must be thread unique
@@ -13,10 +9,11 @@ import java.util.UUID;
  */
 public class ReentrantRedisLock extends DefaultRedisLock{
 
-    private static ThreadLocal<TokenBody> tokenMap = new ThreadLocal<>();
+    private static ThreadLocal<TokenBody> tokenMap;
 
     private ReentrantRedisLock(RedisLockBuilder builder) {
         super(builder);
+        initThread();
     }
 
     /**
@@ -26,15 +23,20 @@ public class ReentrantRedisLock extends DefaultRedisLock{
      * @Date 2019/1/7
      */
     public boolean tryLock(String key, String token) {
-        token = getLockToken(token);
-        // the same thread not need get RedisLock
-        return isSameThread(token) || super.tryLock(key, token);
+        if(isSameThread() || super.tryLock(key,token) ){
+            getLockToken(token);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean tryLock(String key, String token, int expireTime) {
-        token = getLockToken(token);
-        return isSameThread(token) || super.tryLock(key, token,expireTime);
+        if(isSameThread() || super.tryLock(key,token,expireTime)){
+            getLockToken(token);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -44,11 +46,11 @@ public class ReentrantRedisLock extends DefaultRedisLock{
      * @return void
      * @Date 2019/1/7
      */
-    public void lock(String key, String token) throws InterruptedException {
-        token = getLockToken(token);
-        if(isSameThread(token))
-            return;
-        super.lock(key,token);
+    public boolean lock(String key, String token) throws InterruptedException {
+        if(isSameThread() || super.lock(key,token)){ //blocking
+            getLockToken(token);
+        }
+        return true;
     }
 
 
@@ -61,8 +63,13 @@ public class ReentrantRedisLock extends DefaultRedisLock{
      * @Date 2019/1/8
      */
     public boolean lock(String key, String token, int tryTime) throws InterruptedException {
-        token = getLockToken(token);
-        return isSameThread(token) || super.lock(key, token, tryTime);
+        if(isSameThread() || super.lock(key,token,tryTime)){
+            getLockToken(token);
+            return true;
+        }
+        return false;
+//        token = getLockToken(token);
+//        return isSameThread(token) || super.lock(key, token, tryTime);
     }
 
     /**
@@ -77,14 +84,12 @@ public class ReentrantRedisLock extends DefaultRedisLock{
     }
 
 
-    private boolean isSameThread(String token){
+    private boolean isSameThread(){
         TokenBody tokenBody = tokenMap.get();
         boolean result = false;
         if(tokenBody != null){
-            if(tokenBody.getToken().equals(token)){
-                tokenBody.addNum();
-                result = true;
-            }
+            tokenBody.addNum();
+            result = true;
         }
         return result;
     }
@@ -95,9 +100,6 @@ public class ReentrantRedisLock extends DefaultRedisLock{
      * @Date 2019/1/7
      */
     private String getLockToken(String token){
-        if(StringUtils.isEmpty(token)){
-            token = UUID.randomUUID().toString();
-        }
         TokenBody tokenBody = tokenMap.get();
         if(tokenBody == null){  // this thread first get RedisLock
             tokenBody = new TokenBody(token,1);
@@ -119,16 +121,19 @@ public class ReentrantRedisLock extends DefaultRedisLock{
         TokenBody tokenBody = tokenMap.get();
         boolean canBeDelete = false;
         if(tokenBody != null){
-            if(tokenBody.getToken().equals(token)){
-                tokenBody.minusNum();
-                if(tokenBody.getNum()==0){
-                    canBeDelete = true;
-                }
+            tokenBody.minusNum();
+            if(tokenBody.getNum() == 0 && tokenBody.getToken().equals(token)){
+                canBeDelete = true;
+                initThread();
             }
         }
         return canBeDelete;
     }
 
+
+    private static void initThread(){
+        tokenMap = new ThreadLocal<>();
+    }
 
 
     class TokenBody{

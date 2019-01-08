@@ -2,7 +2,7 @@ package com.jy.common.lock;
 
 import com.jy.common.constant.RedisToolsConstant;
 import com.jy.common.constant.RedisType;
-import com.jy.common.exception.NotFoundLockClassException;
+import com.jy.common.exception.RedisConnectionException;
 import com.jy.common.exception.RedisLockInitException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,16 +76,19 @@ public class RedisLockBuilder {
     public RedisLock build() {
         if(jedisConnectionFactory == null){
             logger.error("can not get redis connection ... ");
-            throw new NotFoundLockClassException();
+            throw new RedisConnectionException();
         }
         RedisLock lock;
         try {
-            Constructor<? extends RedisLock> constructor = redisLock.getConstructor(RedisLockBuilder.class);
+            Constructor<? extends RedisLock> constructor = redisLock.getDeclaredConstructor(RedisLockBuilder.class);
+            constructor.setAccessible(true);
             lock = constructor.newInstance(this);
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+            e.printStackTrace();
             throw new RedisLockInitException();
         }
         return lock;
     }
+
 
 }
