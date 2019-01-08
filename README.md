@@ -48,6 +48,19 @@ public class Test{
         }
 
     }
+    
+    public void useBlocking() {
+            String key = "key";
+            String token = UUID.randomUUID().toString();
+            try {
+                redisLock.lock(key, token);
+                //do something
+            } finally {
+                redisLock.unlock(key,token) ;
+            }
+    
+        }
+    
 }
 ```
 
