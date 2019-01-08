@@ -30,6 +30,7 @@ public class RedisLimitConfig {
 ```
 2.use bean
 ```java
+public class Test{
     @Autowired
     private RedisLock redisLock ;
 
@@ -47,5 +48,6 @@ public class RedisLimitConfig {
         }
 
     }
+}
 ```
 
