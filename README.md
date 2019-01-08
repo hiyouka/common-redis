@@ -3,8 +3,8 @@
 ## RedisLock
 
 RedisLock have tow implementation class:   
- &emsp; DefauleRedisLock : not support reentrant lock   
- &emsp; ReentrantLock : support thread reentrant
+ &emsp; **DefauleRedisLock** : not support reentrant lock   
+ &emsp; **ReentrantLock** : support thread reentrant
 
 ### Example:
 
