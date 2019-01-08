@@ -19,7 +19,7 @@ public class RedisLimitConfig {
     @Bean
     public RedisLock redisLock(){
         return LockPayLoad.newBuilder()
-                .connection(jedisConnectionFactory) //default get from spring ioc
+                .connection(jedisConnectionFactory) //this property must be set
                 .lockType(ReentrantRedisLock.class) //default DefaultRedisLock
                 .redisType(RedisType.SINGLE)        //default single
                 .sleepTime(100)                     //default 100

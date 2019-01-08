@@ -6,7 +6,6 @@ import com.jy.common.exception.RedisConnectionException;
 import com.jy.common.exception.RedisLockInitException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 
 import java.lang.reflect.Constructor;
@@ -23,7 +22,6 @@ public class RedisLockBuilder {
 
     private Class<? extends RedisLock> redisLock = DefaultRedisLock.class;
 
-    @Autowired
     private JedisConnectionFactory jedisConnectionFactory ;
 
     private RedisType type = RedisType.SINGLE;
@@ -84,7 +82,6 @@ public class RedisLockBuilder {
             constructor.setAccessible(true);
             lock = constructor.newInstance(this);
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-            e.printStackTrace();
             throw new RedisLockInitException();
         }
         return lock;
