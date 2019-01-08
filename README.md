@@ -2,9 +2,11 @@
 
 ## RedisLock
 
-RedisLock have tow implementation class:   
-    DefauleRedisLock : not support reentrant lock   
-    ReentrantLock : support thread reentrant
+RedisLock have tow implementation class:  
+
+  DefauleRedisLock : not support reentrant lock
+  
+  ReentrantLock : support thread reentrant
 
 ### Example:
 
