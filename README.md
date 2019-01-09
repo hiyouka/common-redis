@@ -16,15 +16,27 @@ public class RedisLimitConfig {
     @Autowired
     private JedisConnectionFactory jedisConnectionFactory;
     
+    @Autowired
+    private RedisTemplate redisTemplate;
+    
     @Bean
     public RedisLock redisLock(){
         return LockPayLoad.newBuilder()
-                .connection(jedisConnectionFactory) //this property must be set
                 .lockType(ReentrantRedisLock.class) //default DefaultRedisLock
                 .redisType(RedisType.SINGLE)        //default single
                 .sleepTime(100)                     //default 100
                 .lockPrefix("lock_")                //default lock_
-                .build();
+                .build(jedisConnectionFactory);
+    }
+    
+    @Bean
+    public RedisLock redisLock(){
+        return LockPayLoad.newBuilder()
+                .lockType(ReentrantRedisLock.class) //default DefaultRedisLock
+                .redisType(RedisType.SINGLE)        //default single
+                .sleepTime(100)                     //default 100
+                .lockPrefix("lock_")                //default lock_
+                .build(redisTemplate);
     }
 }
 ```
