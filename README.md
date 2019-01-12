@@ -7,7 +7,8 @@ RedisLock have tow implementation class:
  &emsp; **ReentrantRedisLock** : support thread reentrant
 
 
-## Qucik Start:
+## Quick Start:
+
 ### Example:
 
 1.get bean
